@@ -1,0 +1,139 @@
+"use client"
+import Editor from "@/lib/components/Editor";
+import withAuth from "@/lib/components/withAuth";
+import ManageDoc from "@/lib/utils/ManageDoc";
+import { useEffect, useState } from "react";
+
+const page = ({params, session}) => {
+  const docId = params.docId[0];
+
+  /* 변수 선언 단계 */
+  const [title, setTitle] = useState("");
+  const [blocks, setBlocks] = useState([]);
+  const [focus, setFocus] = useState(-2);
+  // console.log('(edit-doc) docId : ', docId);
+  const defaultBlock = {
+    type: "markdown",
+    content: ""
+  };
+  let doc = new ManageDoc({docId: docId, userId: session.user.id});
+  
+  /* 함수 정의 단계 */
+  const fetchDoc = async () => {
+    await doc.fetch();
+    // check doc.ownerId === userId
+    // console.log('(edit-doc) doc : ', doc.blocks);
+    const newBlocks = [...doc.blocks];
+    newBlocks.map((block) => block.selected = false);
+    updateBlocks(newBlocks);
+
+    updateTitle(doc.title);
+  }
+  const updateBlocks = (blocks) => {
+    if (blocks.length === 0) {
+      setBlocks([defaultBlock]);
+    } else {
+      setBlocks(blocks);
+    }
+  };
+  const adjustHeight = (idx) => {
+    let element = document.getElementById(idx);
+    if (element instanceof HTMLElement) {
+      if (element.tagName === 'TEXTAREA') {
+        element.style.height = "10px";
+        element.style.height = (element.scrollHeight) + "px";
+      }
+    }
+  }
+  const handleBlocksHeight = () => {
+    blocks.map((block, idx) => adjustHeight(idx));
+
+    adjustHeight(-1);//adjust height of title-block
+  }
+  const updateTitle = (newTitle) => {
+    //add validation
+    setTitle(newTitle);
+  }
+  
+  const blockHandleInput = (event, idx) => {
+    event.preventDefault();
+    let newBlocks = [...blocks];
+    newBlocks[idx].content = event.target.value;
+    updateBlocks(newBlocks);
+  }
+  const deleteBlock = (idx) => {
+    const newBlocks = [...blocks];
+    newBlocks.splice(idx, 1);
+    setBlocks(newBlocks);
+    setFocus(idx);
+  }
+  const blockHandleKeyDown = (event, idx) => {
+    if (event.key === 'Enter') {
+      event.preventDefault();
+      let newBlocks = [...blocks];
+      newBlocks.splice(idx + 1, 0, defaultBlock);
+      updateBlocks(newBlocks);
+      //move focus
+      setFocus(idx+1);
+    } else if (event.key === 'Backspace') {
+      if (blocks[idx].content === "") {
+        event.preventDefault();
+        // console.log('(edit-doc) backspace pressed!!');
+        deleteBlock(idx);
+        setFocus(idx - 1);
+      }
+    }
+  }
+  const blockHandleClick = (event, idx) => {
+      setFocus(idx);
+  }
+
+  const handleSubmit = async () => {
+    doc.title = title;
+    doc.blocks = [...blocks];
+    await doc.upload();
+  }
+  
+  /* event handling */
+  useEffect(() => {
+    fetchDoc();
+
+  }, []);
+
+  useEffect(() => {
+    const block = document.getElementById(focus);
+    if (block instanceof HTMLElement) {
+      // console.log('(edit-doc) type of block : ', block.tagName);
+      if (block.tagName === 'TEXTAREA') {
+        block.focus();
+        block.selectionStart = block.value.length;
+        block.selectionEnd = block.value.length;
+      }
+    }
+  }, [focus]);
+
+  useEffect(() => {
+    handleBlocksHeight();
+    window.addEventListener('resize', handleBlocksHeight);
+    
+    return () => { window.removeEventListener('resize', handleBlocksHeight); };
+  }, [blocks]);
+
+
+  /* return */
+  return (
+    <Editor
+      focus={focus}
+      title={title}
+      titleHandleInput={updateTitle}
+      blocks={blocks}
+      blockHandleKeyDown={blockHandleKeyDown}
+      blockHandleInput={blockHandleInput}
+      adjustHeight={adjustHeight}
+      handleSubmit={handleSubmit}
+      blockHandleClick={blockHandleClick}
+    />
+  )
+}
+
+export default withAuth(page)
