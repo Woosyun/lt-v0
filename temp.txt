@@ -1,0 +1,67 @@
+const [selectionStart, setSelectionStart] = useState({ x: 0, y: 0 });
+const [selectionEnd, setSelectionEnd] = useState({ x: 0, y: 0 });
+const [isSelecting, setIsSelecting] = useState(false);
+const [selectedComponents, setSelectedComponents] = useState([]);  const [selectionStart, setSelectionStart] = useState({ x: 0, y: 0 });
+const [selectionEnd, setSelectionEnd] = useState({ x: 0, y: 0 });
+const [isSelecting, setIsSelecting] = useState(false);
+const [selectedComponents, setSelectedComponents] = useState([]);
+
+const handleMouseDown = (event) => {
+  // event.stopPropagation();
+  if (event.target.className === "editor-container") {
+    event.preventDefault();
+    const startX = event.clientX;
+    const startY = event.clientY;
+
+    setIsSelecting(true);
+    setSelectionStart({ x: startX, y: startY });
+    setSelectionEnd({ x: startX, y: startY });
+    setSelectedComponents([]);
+  }
+};
+const handleMouseMove = (event) => {
+  if (!isSelecting) return;
+  setSelectionEnd({ x: event.clientX, y: event.clientY });
+};
+const handleMouseUp = () => {
+  setIsSelecting(false);
+  updateSelectedComponents();
+  // console.log(`startX=${selectionStart.x} startY=${selectionStart.y}`);
+  // console.log(`endX=${selectionEnd.x} endY=${selectionEnd.y}`);
+};
+
+const updateSelectedComponents = () => {
+  const left = selectionStart.x < selectionEnd.x ? selectionStart.x : selectionEnd.x;
+  const top = selectionStart.y < selectionEnd.y ? selectionStart.y : selectionEnd.y;
+  const right = selectionStart.x > selectionEnd.x ? selectionStart.x : selectionEnd.x;
+  const bottom = selectionStart.y > selectionEnd.y ? selectionStart.y : selectionEnd.y;
+  const newSelectedComponents = [];
+  
+  blocks.map((_, idx) => {
+    const temp = document.getElementById(idx);
+    const rect = temp.getBoundingClientRect();
+    if (rect.top >= top && rect.left >= left && rect.bottom <= bottom && rect.right <= right) {
+      newSelectedComponents.push(idx);
+      // console.log(`${idx}th component selected!!`);
+    }
+  })
+
+  setSelectedComponents(newSelectedComponents);
+};
+
+useEffect(() => {
+  // selectedComponents.map((idx)=>console.log(`selected components : `, idx));
+  selectedComponents.map((idx) => {
+    const temp = document.getElementById(idx);
+    temp.style.border = "2px solid red";
+  })
+
+  return (() => {
+    selectedComponents.map((idx) => {
+      const temp = document.getElementById(idx);
+      if (temp && temp.style) {
+        temp.style.border = "2px solid gray";
+      }
+    })
+  })
+}, [selectedComponents]);

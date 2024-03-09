@@ -1,26 +1,10 @@
 "use client"
 import withAuth from "@/lib/components/withAuth";
-import { useState } from "react";
+import Test from "@/lib/components/Test";
 
-const page = ({session}) => {
-  const [li, setLi] = useState([1,2,3]);
-
+const page = ({ session }) => {
   return (
-    <>
-      {li.map((elem, idx) => (
-        <input
-          value={elem}
-          onChange={(e) => {
-            const newLi = [...li];
-            newLi[idx] = e.target.value;
-            setLi(newLi);
-          }}
-        />
-      ))}
-      {li.map((elem, idx) => (
-        <div>{elem}</div>
-      ))}
-    </>
+    <Test />
   )
 }
 

@@ -1,0 +1,6 @@
+.container {
+  position: absolute;
+  border: 1px solid #000;
+  background-color: rgba(0, 0, 0, 0.1);
+  pointer-events: none;
+}

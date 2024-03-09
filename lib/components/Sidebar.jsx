@@ -1,15 +1,16 @@
 "use client"
 import { useSession } from "next-auth/react";
 import Link from "next/link";
+import styles from "@/styles/sidebar.module.css"
 
 const Sidebar = () => {
   const { data: session } = useSession();
   const userName = session?.user?.name;
 
   return (
-    <div className="sidebar-container">
+    <div className={styles.container}>
 
-      <div className="sidebar-item sidebar-item1">
+      <div className={styles.item1}>
         {session
           ? <p>[{userName}]</p>
           : <Link href={'/signIn'}>sign in</Link>
@@ -18,18 +19,18 @@ const Sidebar = () => {
 
       <Link
         href={'/'}
-        className="link-without-underline"
+        className={styles.link}
       >
-        <div className="sidebar-item">
+        <div className={styles.item}>
             Home
         </div>
       </Link>
 
       <Link
         href={'/dashboard'}
-        className="link-without-underline"
+        className={styles.link}
       >
-        <div className="sidebar-item">
+        <div className={styles.item}>
           dashboard
         </div>
       </Link> 

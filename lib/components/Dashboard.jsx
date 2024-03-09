@@ -1,13 +1,14 @@
 "use client"
 import Link from 'next/link'
+import styles from "@/styles/dashboard.module.css";
 
 const Dashboard = ({posts}) => {
   return (
-    <div className='dashboard'>
+    <div className={styles.container}>
       {posts.map((post, idx) => (
         <div
           key={idx}
-          className='dashboard-post-item1'
+          className={styles.item}
         >
           <PostCard post={post} />
         </div>
@@ -18,7 +19,7 @@ const Dashboard = ({posts}) => {
 
 const PostCard = ({post}) => {
   return (
-    <Link href={`/edit-doc/${post._id}`} className='link-without-underline'>
+    <Link href={`/edit/${post._id}`} className='link-without-underline'>
       {post.title || "empty title"}
     </Link>
   )

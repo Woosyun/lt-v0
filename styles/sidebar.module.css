@@ -1,0 +1,22 @@
+.container{
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+  /* padding: 5px; */
+  border: 2px solid black;
+  width: 200px;
+  height: 600px;
+  /* padding: 5px; */
+}
+.item{
+  padding: 5px;
+}
+.item1{
+  border-bottom: 2px solid gray;
+}
+.link{
+  text-decoration: none;
+}
+.link:hover{
+  background-color: gray;
+}
